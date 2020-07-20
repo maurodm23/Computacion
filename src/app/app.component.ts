@@ -2,44 +2,50 @@ import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import {HttpClient} from '@angular/common/http';
 import { Chart } from 'chart.js';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent implements OnInit, AfterViewInit {
+export class ValidFormComponent implements OnInit {
   title = 'Practica';
-  LineChart=[];
-  API : string = "https://api.covid19api.com/summary";
-  chart;
-  options;
-  country;
-  constructor(private http : HttpClient){}
-   ngAfterViewInit() 
-  {
+
+  myForm: FormGroup;
+
+  constructor(private fb: FormBuilder) { }
+
+  ngOnInit(){ 
+    this.myForm = this.fb.group({
+      email: ['', [
+        Validators.required,
+        Validators.email
+      ]],
+      password: ['', [
+        Validators.required,
+        Validators.pattern('^(?=.*[0-9])(?=.*[a-zA-Z])([a-zA-Z0-9]+)$')
+      ]],
+      age: [null, [
+        Validators.required,
+        Validators.minLength(2), 
+        Validators.min(18), 
+        Validators.max(65)
+      ]]
+    });
   }
 
-  ngOnInit()
-  {
-    //Line Chart:
+  get email() {
+    return this.myForm.get('email');
+  }
+
+  get password() {
+    return this.myForm.get('password');
+  }
+
+  get age() {
+    return this.myForm.get('age');
     
-
-    this.GetInfoCoronavirus().subscribe(data => {
-        let res : any = data;
-        this.options = res.Countries;
-        console.log(this.options);
-    })
-    
+ 
   }
-
-  PaisObtenido()
-  {
-      console.log(this.country);
-  }
-  GetInfoCoronavirus()
-  {
-    return this.http.get(this.API);
-  }
-
 }
